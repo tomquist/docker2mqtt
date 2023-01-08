@@ -1,4 +1,5 @@
 import * as MQTT from "async-mqtt";
+import Dockerode from "dockerode";
 import { config } from "./config";
 import { logger } from "./logger";
 
@@ -10,6 +11,24 @@ function fetchUptime() {
   return { topic: "uptime", data: (currentMillis - startTime).toString() };
 }
 
+async function getNodes() {
+  const docker = new Dockerode();
+  const nodes = await docker.listNodes();
+  return { topic: "nodes", data: JSON.stringify(nodes) };
+}
+
+async function getServices() {
+  const docker = new Dockerode();
+  const services = await docker.listServices();
+  return { topic: "services", data: JSON.stringify(services) };
+}
+
+async function getInfo() {
+  const docker = new Dockerode();
+  const info = await docker.info() as unknown;
+  return { topic: "info", data: JSON.stringify(info) };
+}
+    
 interface PollResult {
   topic: string;
   data: string | Buffer;
@@ -19,6 +38,8 @@ type Poller = () => Promise<PollResult | PollResult[]> | PollResult | PollResult
 
 const pollers: Poller[] = [
   fetchUptime,
+  ...(config.isSwarmManager ? [getNodes, getServices] : []),
+  getInfo,
 ];
 
 async function runPoller(client: MQTT.AsyncMqttClient, poller: Poller) {

@@ -14,13 +14,19 @@ async function run() {
   client.on("error", (e) => {
     logger.error("MQTT Error:", e);
   });
-  await subscribeToTopics(client);
-  await runPolling(client);
+  if (config.subscribe) {
+    await subscribeToTopics(client);
+  }
+  if (config.poll) {
+    await runPolling(client);
+  }
 }
 
 run().then(() => {
   logger.log("End");
+  process.exit(0);
 }).catch((e)=> {
   logger.error(e);
+  process.exit(1);
 });
 

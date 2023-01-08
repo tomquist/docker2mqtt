@@ -30,7 +30,7 @@ interface Handler {
 }
 
 const handlers: Handler[] = [
-  { topic: "restart-service", handler: restartService },
+  ...(config.isSwarmManager ? [{ topic: "restart-service", handler: restartService }] : []),
   { topic: "ping", handler: ping },
 ];
   

@@ -74,6 +74,9 @@ export function getConfig() {
     mqttRetain: boolEnvVar("D2M_MQTT_RETAIN"),
     mqttTopic: stringEnvVar("D2M_MQTT_TOPIC", "docker2mqtt"),
     verbose: boolEnvVar("D2M_VERBOSE", false),
+    subscribe: boolEnvVar("D2M_SUBSCRIBE", true),
+    poll: boolEnvVar("D2M_POLL", true),
+    isSwarmManager: boolEnvVar("D2M_IS_SWARM_MANAGER", false),
   };
 }
 
